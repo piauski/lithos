@@ -1,6 +1,7 @@
+#include "core.h"
+
 #include "raylib.h"
 #include "raymath.h"
-#include "stdlib.h"
 
 #define Vector3_Fmt "(X: %f Y: %f Z: %f)"
 #define Vector3_Arg(vec) (vec).x, (vec).y, (vec).z
@@ -8,6 +9,8 @@
 #define SCREEN_FACTOR 100
 #define WIDTH 16 * SCREEN_FACTOR
 #define HEIGHT 9 * SCREEN_FACTOR
+
+#define CHUNK_SIZE 16
 
 typedef enum {
     BLOCK_FACE_TOP,
@@ -18,6 +21,15 @@ typedef enum {
     BLOCK_FACE_WEST,
     __count_block_face,
 } Block_Face;
+
+typedef enum {
+    BLOCK_AIR = 0,
+    BLOCK_STONE
+} Block_Type;
+
+typedef struct {
+    u8 blocks[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+} Chunk;
 
 static Vector3 face_vertices[6][4] = {
     {{0, 1, 1}, {1, 1, 1}, {1, 1, 0}, {0, 1, 0}}, // TOP
@@ -37,7 +49,7 @@ static Vector3 face_normals[6] = {
 	{-1, 0, 0}, // WEST
 };
 
-int add_face(Mesh *mesh, Block_Face f, int v)
+i32 add_face(Mesh *mesh, Block_Face f, i32 v)
 {
     Vector3 n = face_normals[f];
 
@@ -84,19 +96,19 @@ static Mesh gen_mesh_cube(void)
 {
     Mesh mesh = {0};
 
-    int faces = 6;
-    int verts_per_face = 6;
-    int total_verts = faces * verts_per_face;
+    i32 faces = 6;
+    i32 verts_per_face = 6;
+    i32 total_verts = faces * verts_per_face;
 
     mesh.vertexCount = total_verts;
     mesh.triangleCount = faces * 2;
 
-    mesh.vertices = (float *)MemAlloc(total_verts * 3 * sizeof(float));
-    mesh.normals = (float *)MemAlloc(total_verts * 3 * sizeof(float));
-    mesh.texcoords = (float *)MemAlloc(total_verts * 2 * sizeof(float));
+    mesh.vertices = (f32 *)MemAlloc(total_verts * 3 * sizeof(f32));
+    mesh.normals = (f32 *)MemAlloc(total_verts * 3 * sizeof(f32));
+    mesh.texcoords = (f32 *)MemAlloc(total_verts * 2 * sizeof(f32));
 
-    int v = 0;
-    for (int i = 0; i < __count_block_face; ++i) {
+    i32 v = 0;
+    for (u32 i = 0; i < __count_block_face; ++i) {
         v = add_face(&mesh, i, v);
     }
 
@@ -110,8 +122,8 @@ const char *get_camera_direction_string(Camera *camera)
     camera_target.y = 0;
     camera_target = Vector3Normalize(camera_target);
 
-    float look_at_angle_x = Vector3DotProduct((Vector3){1.0f, 0.0f, 0.0f}, camera_target);
-    float look_at_angle_z = Vector3DotProduct((Vector3){0.0f, 0.0f, 1.0f}, camera_target);
+    f32 look_at_angle_x = Vector3DotProduct((Vector3){1.0f, 0.0f, 0.0f}, camera_target);
+    f32 look_at_angle_z = Vector3DotProduct((Vector3){0.0f, 0.0f, 1.0f}, camera_target);
 
     if (look_at_angle_x > 0.5f)       return "East (positive X)";
     else if (look_at_angle_x < -0.5f) return "West (negative X)";
@@ -121,7 +133,7 @@ const char *get_camera_direction_string(Camera *camera)
     return "";
 }
 
-int main(void)
+i32 main(void)
 {
     InitWindow(WIDTH, HEIGHT, "Lithos");
     SetWindowMonitor(0); // force primary monitor
