@@ -14,8 +14,11 @@
 
 void cmd_append_include(Cmd *cmd, String_Builder *sb)
 {
-    cmd_append(cmd, "-I"RAYLIB_DIR"include");
+    cmd_append(cmd, "-I"VENDOR_FOLDER);
+    sb_append_cstr(sb, "-I"VENDOR_FOLDER);
+    sb_append_cstr(sb, "\n");
 
+    cmd_append(cmd, "-I"RAYLIB_DIR"include");
     sb_append_cstr(sb, "-I"RAYLIB_DIR"include");
     sb_append_cstr(sb, "\n");
 }
@@ -46,10 +49,16 @@ int main(int argc, char **argv)
 
     delete_file(CLANGD_FORMAT);
     write_entire_file(CLANGD_FORMAT, clangd_include_sb.items, clangd_include_sb.count);
+    nob_log(INFO, "generated %s", CLANGD_FORMAT);
     if (!nob_cmd_run(&cmd)) return 1;
-    
-    cmd_append(&cmd, BUILD_FOLDER EXECUTABLE_NAME);
-    if (!nob_cmd_run(&cmd)) return 1;
+
+    if (argc > 1) {
+        const char *arg = shift(argv, argc);
+        if (strcmp(arg, "-run") != 0) {
+            cmd_append(&cmd, BUILD_FOLDER EXECUTABLE_NAME);
+            if (!nob_cmd_run(&cmd)) return 1;
+        }
+    }
 
     return 0;
 
