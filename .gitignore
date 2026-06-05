@@ -1,2 +1,5 @@
 build/
 build/*
+compile_flags.txt
+nob.old
+nob
