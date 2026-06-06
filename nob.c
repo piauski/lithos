@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     Cmd cmd = {0};
     cmd_append(&cmd, "cc", "-Wall", "-Wextra");
     cmd_append(&cmd, "-o", BUILD_FOLDER EXECUTABLE_NAME);
-    cmd_append(&cmd, SRC_FOLDER"main.c");
+    cmd_append(&cmd, SRC_FOLDER"one.c");
     cmd_append_include(&cmd, &clangd_include_sb);
     cmd_append_lib(&cmd);
 
