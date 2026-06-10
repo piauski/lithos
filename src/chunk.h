@@ -1,6 +1,7 @@
 #ifndef CHUNK_H_
 #define CHUNK_H_
 
+
 #include "raylib.h"
 
 #include "core.h"
@@ -18,6 +19,12 @@ typedef struct {
     Model model;
 } Chunk;
 
+typedef struct {
+    Chunk *items;
+    size_t count;
+    size_t capacity;
+} ChunkList;
+
 void chunk_free(Chunk *c);
 void chunk_generate_mesh(Chunk *c);
 
@@ -30,6 +37,15 @@ static inline void chunk_set_block(Chunk *c, int x, int y, int z, Block_Kind typ
 static inline Block_Kind chunk_get_block(Chunk *c, i32 x, i32 y, i32 z)
 {
     return c->blocks[CHUNK_IDX(x, y, z)];
+}
+
+static inline Vector3 chunk_get_render_position(Chunk *c)
+{
+    return (Vector3){
+        (float)c->position.x * CHUNK_SIZE,
+        (float)c->position.y * CHUNK_SIZE,
+        (float)c->position.z * CHUNK_SIZE,
+    };
 }
 
 

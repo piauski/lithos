@@ -1,10 +1,12 @@
 #include <assert.h>
 #include <stdbool.h>
-#include "core.h"
 
+#define NOB_STRIP_PREFIX
+#include "nob.h"
 #include "raylib.h"
 #include "raymath.h"
 
+#include "core.h"
 #include "chunk.h"
 
 #define Vector3_Fmt "(X: %f Y: %f Z: %f)"
@@ -49,6 +51,8 @@ i32 main(void)
 
     atlas_init("resources/textures/terrain.png", 16, 16);
 
+    ChunkList chunks = {0};
+
     Chunk chunk = {0};
     chunk_set_block(&chunk, 0, 0, 0, BLOCK_STONE);
     chunk_set_block(&chunk, 1, 0, 0, BLOCK_STONE);
@@ -56,10 +60,19 @@ i32 main(void)
     chunk_set_block(&chunk, 0, 0, 1, BLOCK_GRASS);
     chunk_set_block(&chunk, 0, 0, 2, BLOCK_STONE_SLAB);
     chunk_set_block(&chunk, 1, 1, 1, BLOCK_TORCH);
-
-
-    if (chunk.dirty) {
-        chunk_generate_mesh(&chunk);
+    
+    Chunk chunk2 = { .position = {1, 0, 0} };
+    chunk_set_block(&chunk2, 0, 0, 0, BLOCK_STONE);
+    chunk_set_block(&chunk2, 1, 0, 0, BLOCK_STONE);
+    chunk_set_block(&chunk2, 1, 0, 1, BLOCK_GRASS);
+    chunk_set_block(&chunk2, 0, 0, 1, BLOCK_GRASS);
+    chunk_set_block(&chunk2, 0, 0, 2, BLOCK_STONE_SLAB);
+    chunk_set_block(&chunk2, 1, 1, 1, BLOCK_TORCH);
+    da_append(&chunks, chunk);
+    da_append(&chunks, chunk2);
+    da_foreach(Chunk, chunk, &chunks) {
+        if (chunk->dirty)
+            chunk_generate_mesh(chunk);
     }
 
     while (!WindowShouldClose()) {
@@ -77,7 +90,9 @@ i32 main(void)
                 DrawLine3D(Vector3Zero(), (Vector3){0, 1, 0}, GREEN);
                 DrawLine3D(Vector3Zero(), (Vector3){0, 0, 1}, BLUE);
 
-                DrawModel(chunk.model, (Vector3){0,0,0}, 1, WHITE);
+                da_foreach(Chunk, chunk, &chunks) {
+                    DrawModel(chunk->model, chunk_get_render_position(chunk), 1, WHITE);
+                }
             }
             EndMode3D();
             DrawText(TextFormat("Lithos Alpha - FPS: %d", GetFPS()), 0, 0, 20, BLACK);
