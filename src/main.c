@@ -50,8 +50,10 @@ i32 main(void)
     Chunk chunk = {0};
     chunk_set_block(&chunk, 0, 0, 0, BLOCK_STONE);
     chunk_set_block(&chunk, 1, 0, 0, BLOCK_STONE);
-    chunk_set_block(&chunk, 1, 0, 1, BLOCK_STONE);
-    chunk_set_block(&chunk, 0, 0, 1, BLOCK_STONE);
+    chunk_set_block(&chunk, 1, 0, 1, BLOCK_GRASS);
+    chunk_set_block(&chunk, 0, 0, 1, BLOCK_GRASS);
+    chunk_set_block(&chunk, 0, 0, 2, BLOCK_STONE_SLAB);
+    chunk_set_block(&chunk, 1, 1, 1, BLOCK_TORCH);
 
 
     if (chunk.dirty) {
@@ -69,11 +71,11 @@ i32 main(void)
             BeginMode3D(camera);
             {
                 DrawGrid(100, 1.0f);
-                DrawLine3D(Vector3Zero(), (Vector3){1.0f, 0.0f, 0.0f}, RED);
-                DrawLine3D(Vector3Zero(), (Vector3){0.0f, 1.0f, 0.0f}, GREEN);
-                DrawLine3D(Vector3Zero(), (Vector3){0.0f, 0.0f, 1.0f}, BLUE);
+                DrawLine3D(Vector3Zero(), (Vector3){1, 0, 0}, RED);
+                DrawLine3D(Vector3Zero(), (Vector3){0, 1, 0}, GREEN);
+                DrawLine3D(Vector3Zero(), (Vector3){0, 0, 1}, BLUE);
 
-                DrawModel(chunk.model, Vector3Zero(), 1.0f, WHITE);
+                DrawModel(chunk.model, (Vector3){0,0,0}, 1, WHITE);
             }
             EndMode3D();
             DrawText(TextFormat("Lithos Alpha - FPS: %d", GetFPS()), 0, 0, 20, BLACK);
