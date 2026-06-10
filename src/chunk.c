@@ -3,6 +3,7 @@
 #include "core.h"
 #include "atlas.h"
 #include "raylib.h"
+#include "raymath.h"
 
 static const Vector3 face_vertices[__count_block_face][4] = {
     [BLOCK_FACE_POS_X] = {{1, 0, 1}, {1, 0, 0}, {1, 1, 0}, {1, 1, 1}}, // EAST
@@ -37,7 +38,8 @@ static bool chunk_neighbor_is_transparent(Chunk *c, i32 x, i32 y, i32 z)
         return true;
     }
 
-    return block_is_transparent(chunk_get_block(c, x, y, z));
+    Block_Kind block = chunk_get_block(c, x, y, z);
+    return !block_occludes(block);
 }
 
 static u32 chunk_count_visible_faces(Chunk *c, i32 x, i32 y, i32 z)
@@ -61,7 +63,7 @@ static bool chunk_face_visible(Chunk *c, i32 x, i32 y, i32 z, Block_Face face)
     return chunk_neighbor_is_transparent(c, nx, ny, nz);
 }
 
-static i32 chunk_add_face_from_volume(Chunk *chunk, Atlas atlas, Block_Kind kind, Block_Face face, Volume volume, i32 x, i32 y, i32 z, i32 v)
+static i32 chunk_add_face_from_volume(Chunk *chunk, Atlas atlas, Block_Kind kind, Block_Face face, Volume volume, i32 cx, i32 cy, i32 cz, i32 v)
 {
     Vector3 n = face_normals[face];
     Vector3 min = Vector3Divide(volume.from, (Vector3){16.0f, 16.0f, 16.0f});
@@ -107,7 +109,7 @@ static i32 chunk_add_face_from_volume(Chunk *chunk, Atlas atlas, Block_Kind kind
         default: assert(false && "Unreachable (Block_Face)");
     }
 
-    Vector3 offset = (Vector3){ x, y, z };
+    Vector3 offset = (Vector3){ cx, cy, cz };
     a = Vector3Add(a, offset);
     b = Vector3Add(b, offset);
     c = Vector3Add(c, offset);
@@ -164,7 +166,7 @@ void chunk_generate_mesh(Chunk *c)
         for (u32 cy = 0; cy < CHUNK_SIZE; ++cy) {
             for (u32 cz = 0; cz < CHUNK_SIZE; ++cz) {
                 Block_Kind kind = chunk_get_block(c, cx, cy, cz);
-                //if (block_is_transparent(kind)) continue;
+                if (kind == BLOCK_AIR) continue;
                 faces += chunk_count_visible_faces(c, cx, cy, cz);
             }
         }
@@ -192,8 +194,8 @@ void chunk_generate_mesh(Chunk *c)
         for (u32 cy = 0; cy < CHUNK_SIZE; ++cy) {
             for (u32 cz = 0; cz < CHUNK_SIZE; ++cz) {
                 Block_Kind kind = chunk_get_block(c, cx, cy, cz);
+                if (kind == BLOCK_AIR) continue;
                 const Block *block = &block_definitions[kind];
-                //if (block_is_transparent(kind)) continue;
                 for (Block_Face face = 0; face < __count_block_face; ++face) {
                     if (chunk_face_visible(c, cx, cy, cz, face)) {
                         v = chunk_add_face_from_volume(c, terrain, kind, face, block->volume, cx, cy, cz, v);

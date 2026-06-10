@@ -1,42 +1,43 @@
 #include "block.h"
 
-const Block block_definitions[__count_block_type] = {
-    [BLOCK_AIR] = { .is_transparent = true },
+const Block block_definitions[__count_block_kind] = {
+    [BLOCK_AIR] = { 0 },
     [BLOCK_STONE] = {
-        .volume = volume_full_cube,
-        .is_solid = true,
-        .simple_texture = true,
+        .name = "Stone",
+        .flags = BLOCK_FLAG_SOLID | BLOCK_FLAG_OCCLUDES,
+        .volume = volume_cube_all,
         .textures = {
             ATLAS_INDEX_STONE,
         }
     },
     [BLOCK_STONE_SLAB] = {
+        .name = "Stone Slab",
+        .flags = 0,
         .volume = volume_slab_bottom,
-        .is_transparent = true,
-        .simple_texture = true,
         .textures = {
             ATLAS_INDEX_STONE,
         }
     },
     [BLOCK_TORCH] = {
+        .name = "Torch",
+        .flags = 0,
         .volume = {{7,0,7}, {9,10,9}},
-        .is_transparent = true,
-        .simple_texture = true,
         .textures = {
             ATLAS_INDEX_STONE,
         }
     },
     [BLOCK_DIRT] = {
-        .volume = volume_full_cube,
-        .is_solid = true,
-        .simple_texture = true,
+        .name = "Dirt",
+        .flags = BLOCK_FLAG_SOLID | BLOCK_FLAG_OCCLUDES,
+        .volume = volume_cube_all,
         .textures = {
             ATLAS_INDEX_DIRT,
         }
     },
     [BLOCK_GRASS] = {
-        .volume = volume_full_cube,
-        .is_solid = true,
+        .name = "Grass",
+        .flags = BLOCK_FLAG_SOLID | BLOCK_FLAG_OCCLUDES,
+        .volume = volume_cube_all,
         .textures = {
             [BLOCK_FACE_POS_Y] = ATLAS_INDEX_GRASS_TOP,
             [BLOCK_FACE_NEG_Y] = ATLAS_INDEX_DIRT,
