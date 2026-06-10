@@ -1,4 +1,5 @@
 #include "main.c"
-#include "lith_math.c"
+#include "maths.c"
 #include "block.c"
 #include "chunk.c"
+#include "atlas.c"

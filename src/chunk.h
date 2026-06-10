@@ -4,7 +4,7 @@
 #include "raylib.h"
 
 #include "core.h"
-#include "lith_math.h"
+#include "maths.h"
 #include "block.h"
 
 #define CHUNK_SIZE 16

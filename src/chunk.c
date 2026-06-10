@@ -63,7 +63,7 @@ static bool chunk_face_visible(Chunk *c, i32 x, i32 y, i32 z, Block_Face face)
     return chunk_neighbor_is_transparent(c, nx, ny, nz);
 }
 
-static i32 chunk_add_face_from_volume(Chunk *chunk, Atlas atlas, Block_Kind kind, Block_Face face, Volume volume, i32 cx, i32 cy, i32 cz, i32 v)
+static i32 chunk_add_face_from_volume(Chunk *chunk, Block_Kind kind, Block_Face face, Volume volume, i32 cx, i32 cy, i32 cz, i32 v)
 {
     Vector3 n = face_normals[face];
     Vector3 min = Vector3Divide(volume.from, (Vector3){16.0f, 16.0f, 16.0f});
@@ -119,7 +119,7 @@ static i32 chunk_add_face_from_volume(Chunk *chunk, Atlas atlas, Block_Kind kind
 
     f32 u0, u1, v0, v1;
     Atlas_Index tex_index = block_get_textures(kind)[face];
-    atlas_get_uvs(&atlas, tex_index, &u0, &u1, &v0, &v1);
+    atlas_get_uvs(atlas_get(), tex_index, &u0, &u1, &v0, &v1);
 
     // triangle 1: a b c
     mesh->vertices[v*3+0] = a.x; mesh->vertices[v*3+1] = a.y; mesh->vertices[v*3+2] = a.z;
@@ -198,7 +198,7 @@ void chunk_generate_mesh(Chunk *c)
                 const Block *block = &block_definitions[kind];
                 for (Block_Face face = 0; face < __count_block_face; ++face) {
                     if (chunk_face_visible(c, cx, cy, cz, face)) {
-                        v = chunk_add_face_from_volume(c, terrain, kind, face, block->volume, cx, cy, cz, v);
+                        v = chunk_add_face_from_volume(c, kind, face, block->volume, cx, cy, cz, v);
                     }
                 }
             }
@@ -208,6 +208,6 @@ void chunk_generate_mesh(Chunk *c)
     UploadMesh(&c->mesh, false);
     c->model = LoadModelFromMesh(c->mesh);
 
-    c->model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = terrain.texture;
+    c->model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = atlas_get()->texture;
     c->dirty = false;
 }

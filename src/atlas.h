@@ -15,18 +15,13 @@ typedef enum {
 typedef struct {
     u16 rows, cols;
     Texture2D texture;
+    b32 initialized;
 } Atlas;
 
-// TODO: Fix texture squishing on non-solid faces
-void atlas_get_uvs(const Atlas *a, Atlas_Index index, f32 *u0, f32 *u1, f32 *v0, f32 *v1) {
-    f32 u_step = 1.0f / a->cols;
-    f32 v_step = 1.0f / a->rows;
-    u16 x_index = index % a->cols;
-    u16 y_index = index / a->cols;
-    *u0 = (float)x_index * u_step;
-    *v0 = (float)y_index * v_step;
-    *u1 = (float)(x_index + 1) * u_step;
-    *v1 = (float)(y_index + 1) * v_step;
-}
+void atlas_init(const char *path, u16 rows, u16 cols);
+void atlas_destroy();
+const Atlas *atlas_get(void);
+
+void atlas_get_uvs(const Atlas *a, Atlas_Index index, f32 *u0, f32 *u1, f32 *v0, f32 *v1);
 
 #endif // !ATLAS_H_

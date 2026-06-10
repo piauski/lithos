@@ -47,6 +47,8 @@ i32 main(void)
         .projection = CAMERA_PERSPECTIVE,
     };
 
+    atlas_init("resources/textures/terrain.png", 16, 16);
+
     Chunk chunk = {0};
     chunk_set_block(&chunk, 0, 0, 0, BLOCK_STONE);
     chunk_set_block(&chunk, 1, 0, 0, BLOCK_STONE);
